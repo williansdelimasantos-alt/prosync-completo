@@ -1,0 +1,52 @@
+# ProSync - stack de produção local (app + Postgres)
+#
+#   1. Copy-Item .env.example .env    (e ajuste SECRET_KEY / GEMINI_API_KEY)
+#   2. docker compose up --build
+#   3. http://localhost:8000/docs
+#
+# Os dados do Postgres ficam no volume nomeado `pgdata`.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-prosync}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prosync}
+      POSTGRES_DB: ${POSTGRES_DB:-prosync}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-prosync} -d ${POSTGRES_DB:-prosync}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Não exponha o banco em produção; descomente apenas para debug local.
+    # ports:
+    #   - "5432:5432"
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PRODUCTION: ${PRODUCTION:-true}
+      # Sobrescreve o DATABASE_URL do .env: dentro da rede do compose o host é `db`.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-prosync}:${POSTGRES_PASSWORD:-prosync}@db:5432/${POSTGRES_DB:-prosync}
+      # OBRIGATÓRIO: com PRODUCTION=true a app recusa subir usando o valor padrão.
+      # Gere com: python -c "import secrets; print(secrets.token_urlsafe(48))"
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY obrigatoria - defina no .env (ver .env.example)}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      # Em produção liste as origens reais; `*` é rejeitado no startup.
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
+      GEMINI_TIMEOUT: ${GEMINI_TIMEOUT:-12}
+      AI_ENABLED: ${AI_ENABLED:-true}
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:

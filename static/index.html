@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProSync — Conexão Profissional</title>
+  <meta name="description" content="ProSync conecta profissionais remotos brasileiros com inteligência artificial: descubra gente compatível, encontre mentorias e colabore em desafios reais.">
+  <!-- favicon inline (SVG) evita request 404 em /favicon.ico -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%236c5ce7'/><text x='50' y='72' font-size='60' font-family='sans-serif' font-weight='bold' fill='white' text-anchor='middle'>P</text></svg>">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/v2.css">
+</head>
+<body>
+
+  <!-- ═══ Toast Container ══════════════════════════════════════════════ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ═══ Header ═══════════════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-icon">P</span>
+        ProSync
+      </a>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleHamburger()" aria-label="Menu">☰</button>
+      <nav class="header-nav" id="headerNav">
+        <a href="#" onclick="irPara('descobrir'); closeHamburger()" class="active" data-aba="descobrir">✨ Descobrir</a>
+        <a href="#" onclick="irPara('dashboard'); closeHamburger()" data-aba="dashboard">Painel</a>
+        <a href="#" onclick="mudarAba('profissionais'); closeHamburger()" data-aba="profissionais">Profissionais</a>
+        <a href="#" onclick="mudarAba('mentoria'); closeHamburger()" data-aba="mentoria">Mentoria</a>
+        <a href="#" onclick="mudarAba('oportunidades'); closeHamburger()" data-aba="oportunidades">Oportunidades</a>
+        <a href="#" onclick="mudarAba('desafios'); closeHamburger()" data-aba="desafios">Desafios</a>
+        <a href="#" onclick="mudarAba('conversas'); closeHamburger()" data-aba="conversas" id="navConversas">
+          Conversas <span class="notif-badge" id="conversasBadge" style="display:none">0</span>
+        </a>
+        <div class="header-user" id="headerUser"></div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══ Banner de demonstração ══════════════════════════════════════ -->
+  <div class="demo-banner" id="demoBanner" style="display:none">
+    <span>🎭 <strong>Modo demonstração:</strong> explore a plataforma com uma conta já populada (Ana, engenheira de dados).</span>
+    <button onclick="loginDemo()">Entrar como Ana (demo)</button>
+  </div>
+
+  <!-- ═══ Hero — Conexão com Propósito ═══════════════════════════════════ -->
+  <section class="hero" id="heroSection">
+    <div class="hero-container">
+      <div class="hero-left">
+        <div class="hero-badge">✦ Conexão Profissional com Propósito</div>
+        <h1>O futuro do trabalho remoto<br/>é <span class="gradient-text">conexão com propósito</span></h1>
+        <p class="hero-subtitle">
+          Uma plataforma que usa <strong>inteligência artificial</strong> para <strong>transformar o trabalho remoto de isolado em orgânico</strong>. 
+          Recriamos os encontros casuais do escritório, conectamos profissionais por <strong>afinidade real</strong> 
+          e transformamos currículos em <strong>perfis vivos</strong> — validados por ação, não por auto-promoção.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-hero btn-hero-primary" onclick="abrirAuth('cadastro')">🌟 Começar Agora</button>
+          <button class="btn-hero btn-hero-secondary" onclick="document.getElementById('abaDescobrir').scrollIntoView({behavior:'smooth'})">Ver sugestões da IA</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="num" id="totalProfissionais">—</span>
+            <span class="label">Profissionais</span>
+          </div>
+          <div class="stat-item">
+            <span class="num" id="totalMatches">—</span>
+            <span class="label">Conexões</span>
+          </div>
+          <div class="stat-item">
+            <span class="num" id="statCidades">—</span>
+            <span class="label">Cidades</span>
+          </div>
+          <div class="stat-item">
+            <span class="num" id="statDesafios">—</span>
+            <span class="label">Desafios abertos</span>
+          </div>
+        </div>
+        <div style="margin-top:18px">
+          <span class="ai-chip" id="statsModoIa"><span class="dot"></span>verificando IA...</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="features-panel">
+          <div class="features-label">🍃 O que você encontra aqui</div>
+          <div class="fp-grid">
+            <div class="fp-card">
+              <div class="fp-card-icon">🎯</div>
+              <div class="fp-card-content">
+                <strong>Empresas e talentos</strong>
+                <span>Conexão direta entre empresas e profissionais certos</span>
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon">🔍</div>
+              <div class="fp-card-content">
+                <strong>Networking de verdade</strong>
+                <span>Profissionais do mesmo segmento se encontram naturalmente</span>
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon">📋</div>
+              <div class="fp-card-content">
+                <strong>Perfil vivo</strong>
+                <span>Currículo validado por ação, não por auto-promoção</span>
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon">☕</div>
+              <div class="fp-card-content">
+                <strong>Cafés virtuais</strong>
+                <span>Encontros espontâneos com matches inteligentes</span>
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon">🧠</div>
+              <div class="fp-card-content">
+                <strong>Mentoria</strong>
+                <span>Quem sabe conecta com quem quer aprender</span>
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon">🤝</div>
+              <div class="fp-card-content">
+                <strong>Desafios</strong>
+                <span>Colaboração que gera conexões reais</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span>Role para explorar</span>
+      <div class="scroll-arrow">↓</div>
+    </div>
+  </section>
+
+  <!-- ═══ ABA v2: Descobrir (feed inteligente) ═════════════════════════ -->
+  <div id="abaDescobrir" class="aba-v2" style="display:none">
+    <main class="feed">
+      <div class="feed-hero">
+        <div class="feed-title">
+          <h2>✨ Sugestões para você</h2>
+          <span class="ai-chip" id="feedModoIa" style="display:none"><span class="dot"></span>IA</span>
+        </div>
+        <p>Ordenado por compatibilidade real — cada sugestão explica o porquê da conexão.</p>
+      </div>
+      <div class="sugestoes-grid" id="sugestoesGrid">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ ABA v2: Painel ══════════════════════════════════════════════ -->
+  <div id="abaDashboard" class="aba-v2" style="display:none">
+    <main class="feed">
+      <div class="dashboard-wrap" id="dashboardConteudo">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ ABA: Profissionais ═══════════════════════════════════════════ -->
+  <div id="abaProfissionais" style="display:none">
+    <section class="filters">
+      <div class="filters-inner">
+        <div class="filter-row">
+          <input type="text" id="filterSearch" placeholder="Buscar por nome, bio, skill..." />
+          <select id="filterSkill">
+            <option value="">Todas as skills</option>
+            <option value="Python">Python</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="React">React</option>
+            <option value="Node.js">Node.js</option>
+            <option value="Design">Design</option>
+            <option value="UX">UX</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Dados">Dados</option>
+            <option value="DevOps">DevOps</option>
+            <option value="Mobile">Mobile</option>
+          </select>
+          <select id="filterSenioridade">
+            <option value="">Todas senioridades</option>
+            <option value="junior">Júnior</option>
+            <option value="pleno">Pleno</option>
+            <option value="senior">Sênior</option>
+          </select>
+          <button class="btn-filter" onclick="carregarProfissionais()">Filtrar</button>
+        </div>
+      </div>
+    </section>
+
+    <main class="feed">
+      <div class="feed-header">
+        <h2>Profissionais</h2>
+        <span class="feed-count" id="feedCount"></span>
+      </div>
+      <div class="profissionais-grid" id="profissionaisGrid">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ ABA: Desafios ════════════════════════════════════════════════ -->
+  <div id="abaDesafios" style="display:none">
+    <main class="feed">
+      <div class="feed-header">
+        <h2>Desafios Colaborativos</h2>
+        <button class="btn-filter" onclick="openCreateDesafioModal()">➕ Criar Desafio</button>
+      </div>
+
+      <div class="desafio-filters">
+        <select id="desafioFilterStatus">
+          <option value="">Todos os status</option>
+          <option value="aberto">Abertos</option>
+          <option value="em_andamento">Em andamento</option>
+          <option value="concluido">Concluídos</option>
+        </select>
+        <input type="text" id="desafioFilterSkill" placeholder="Filtrar por skill..." />
+        <button class="btn-filter" onclick="carregarDesafios()">Filtrar</button>
+      </div>
+
+      <div id="desafiosList">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ ABA: Conversas ═══════════════════════════════════════════════ -->
+  <div id="abaConversas" style="display:none">
+    <main class="feed">
+      <div class="feed-header">
+        <h2>Conversas</h2>
+      </div>
+      <div id="conversasList">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ ABA: Mentoria ═══════════════════════════════════════════════ -->
+  <div id="abaMentoria" style="display:none">
+    <main class="feed">
+      <div class="feed-header">
+        <h2>Programa de Mentoria</h2>
+        <button class="btn-filter" onclick="carregarMentores()">🔍 Encontrar Mentor</button>
+      </div>
+
+      <div class="tabs" style="margin-bottom:16px">
+        <button class="tab active" onclick="mudarSubAbaMentoria('minhas', this)">Minhas Mentorias</button>
+        <button class="tab" onclick="mudarSubAbaMentoria('mentores', this)">Mentores Disponíveis</button>
+      </div>
+
+      <div id="mentoriaSubMentores" style="display:none">
+        <div id="mentoresList">
+          <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <div id="mentoriaSubMinhas">
+        <div id="mentoriasList">
+          <div class="empty-state">
+            <div class="icon">🧠</div>
+            <h3>Nenhuma mentoria ainda</h3>
+            <p>Encontre um mentor para começar sua jornada de crescimento!</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ ABA: Oportunidades ═══════════════════════════════════════════ -->
+  <div id="abaOportunidades" style="display:none">
+    <main class="feed">
+      <div class="feed-header">
+        <h2>Mural de Oportunidades</h2>
+        <button class="btn-filter" onclick="openCreateOportunidadeModal()">➕ Nova Oportunidade</button>
+      </div>
+
+      <div class="oportunidade-filters">
+        <select id="opFilterTipo">
+          <option value="">Todos os tipos</option>
+          <option value="vaga">Vagas</option>
+          <option value="projeto">Projetos</option>
+          <option value="parceria">Parcerias</option>
+        </select>
+        <input type="text" id="opFilterSkill" placeholder="Filtrar por skill..." />
+        <select id="opFilterStatus">
+          <option value="">Todos os status</option>
+          <option value="aberta">Abertas</option>
+          <option value="preenchida">Preenchidas</option>
+        </select>
+        <button class="btn-filter" onclick="carregarOportunidades()">Filtrar</button>
+      </div>
+
+      <div id="oportunidadesList">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ Modal: Perfil ════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
+      <div class="modal-body" id="profileModalBody"></div>
+      <div class="modal-footer" id="profileModalFooter"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal: Chat ══════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="chatModal">
+    <div class="modal" style="max-width:600px">
+      <button class="modal-close" onclick="fecharChat()">&times;</button>
+      <div class="modal-body">
+        <div id="chatHeader" style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="avatar-sm"><img src="" alt="" id="chatAvatar"></div>
+          <h3 id="chatNome" style="margin:0;font-size:18px"></h3>
+        </div>
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-empty">
+              <div>
+                <div class="icon">💬</div>
+                <p>Nenhuma mensagem ainda. Envie algo!</p>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter') enviarMensagem()" />
+            <button onclick="enviarMensagem()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal v2: Autenticação (login + cadastro) ═══════════════════ -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+      <div class="modal-body">
+        <h2 style="margin-bottom:4px">Bem-vindo à ProSync</h2>
+        <p style="color:var(--text-muted);margin-bottom:18px;font-size:14px">
+          Conexões profissionais com propósito — potencializadas por IA.
+        </p>
+
+        <div class="auth-tabs">
+          <button type="button" data-auth="login" class="active" onclick="trocarAbaAuth('login')">Entrar</button>
+          <button type="button" data-auth="cadastro" onclick="trocarAbaAuth('cadastro')">Criar conta</button>
+        </div>
+
+        <div class="auth-erro" id="authErro" style="display:none"></div>
+
+        <form id="formLogin" onsubmit="return fazerLogin(event)">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" id="loginEmail" required autocomplete="email" placeholder="email@exemplo.com" />
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" name="senha" required autocomplete="current-password" placeholder="Sua senha" />
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%">Entrar</button>
+          <p class="form-hint" style="text-align:center;margin-top:12px">
+            Conta demo: <strong>ana@demo.prosync</strong> / <strong>demo1234</strong>
+          </p>
+        </form>
+
+        <form id="formCadastro" style="display:none" onsubmit="return fazerCadastro(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" name="nome" required minlength="2" placeholder="Seu nome" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" name="email" required placeholder="email@exemplo.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" name="senha" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cidade</label>
+              <input type="text" name="cidade" placeholder="São Paulo" />
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <select name="estado">
+                <option value="">Selecione</option>
+                <option value="AC">AC</option><option value="AL">AL</option><option value="AM">AM</option>
+                <option value="AP">AP</option><option value="BA">BA</option><option value="CE">CE</option>
+                <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+                <option value="MA">MA</option><option value="MG">MG</option><option value="MS">MS</option>
+                <option value="MT">MT</option><option value="PA">PA</option><option value="PB">PB</option>
+                <option value="PE">PE</option><option value="PI">PI</option><option value="PR">PR</option>
+                <option value="RJ">RJ</option><option value="RN">RN</option><option value="RO">RO</option>
+                <option value="RR">RR</option><option value="RS">RS</option><option value="SC">SC</option>
+                <option value="SE">SE</option><option value="SP">SP</option><option value="TO">TO</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Headline</label>
+            <input type="text" name="headline" maxlength="200" placeholder="Ex: Backend Developer | Python & FastAPI" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Senioridade</label>
+              <select name="senioridade">
+                <option value="junior">Júnior</option>
+                <option value="pleno">Pleno</option>
+                <option value="senior">Sênior</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Skills</label>
+              <input type="text" name="skills" placeholder="Python, React, Design" />
+              <p class="form-hint">Separe por vírgula — quanto mais específicas, melhores as sugestões.</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea name="bio" rows="3" maxlength="600" placeholder="Em 2 linhas: o que você faz e o que procura."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Objetivos aqui</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" name="objetivos" value="aprender" /> Aprender</label>
+              <label><input type="checkbox" name="objetivos" value="mentorar" /> Mentorar</label>
+              <label><input type="checkbox" name="objetivos" value="colaborar" checked /> Colaborar</label>
+              <label><input type="checkbox" name="objetivos" value="trabalhar" /> Trabalhar</label>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%">Criar minha conta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal: Criar Desafio ═════════════════════════════════════════ -->
+  <div class="modal-overlay" id="createDesafioModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('createDesafioModal')">&times;</button>
+      <div class="modal-body">
+        <h2 style="margin-bottom:4px">Criar Desafio</h2>
+        <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px">
+          Proponha um desafio colaborativo para outros profissionais
+        </p>
+        <form id="createDesafioForm" onsubmit="return criarDesafio(event)">
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" name="titulo" required minlength="3" placeholder="Ex: App de voluntariado" />
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <textarea name="descricao" placeholder="Descreva o desafio..." rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Skills necessárias</label>
+              <input type="text" name="skills" placeholder="Python, React, Design" />
+            </div>
+            <div class="form-group">
+              <label>Tipo</label>
+              <select name="tipo">
+                <option value="dupla">Dupla</option>
+                <option value="grupo">Grupo</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Prazo (opcional)</label>
+            <input type="date" name="prazo" />
+          </div>
+          <button type="submit" class="btn-primary">Criar Desafio</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal: Detalhe do Desafio ════════════════════════════════════ -->
+  <div class="modal-overlay" id="desafioDetailModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('desafioDetailModal')">&times;</button>
+      <div class="modal-body" id="desafioDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal: Criar Oportunidade ═══════════════════════════════════ -->
+  <div class="modal-overlay" id="createOportunidadeModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('createOportunidadeModal')">&times;</button>
+      <div class="modal-body">
+        <h2 style="margin-bottom:4px">Nova Oportunidade</h2>
+        <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px">
+          Publique uma vaga, projeto ou parceria
+        </p>
+        <form id="createOportunidadeForm" onsubmit="return criarOportunidade(event)">
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" name="titulo" required minlength="3" placeholder="Ex: Vaga para Dev Python" />
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <textarea name="descricao" placeholder="Descreva a oportunidade..." rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo</label>
+              <select name="tipo">
+                <option value="vaga">Vaga</option>
+                <option value="projeto">Projeto</option>
+                <option value="parceria">Parceria</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Skills desejadas</label>
+              <input type="text" name="skills" placeholder="Python, React, Design" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Contato</label>
+            <input type="text" name="contato" placeholder="Email, LinkedIn, Telegram..." />
+          </div>
+          <button type="submit" class="btn-primary">Publicar Oportunidade</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal: Solicitar Mentoria ═══════════════════════════════════ -->
+  <div class="modal-overlay" id="solicitarMentoriaModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('solicitarMentoriaModal')">&times;</button>
+      <div class="modal-body">
+        <h2 style="margin-bottom:4px">Solicitar Mentoria</h2>
+        <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px">
+          Envie sua solicitação de mentoria
+        </p>
+        <form id="solicitarMentoriaForm" onsubmit="return solicitarMentoria(event)">
+          <input type="hidden" name="mentor_id" id="solicitarMentorId" />
+          <div class="form-group">
+            <label>Mentor</label>
+            <p id="solicitarMentorNome" style="color:var(--accent);font-weight:600;font-size:16px"></p>
+          </div>
+          <div class="form-group">
+            <label>Área de interesse</label>
+            <input type="text" name="area" required placeholder="Ex: Desenvolvimento Web, Carreira, Design..." />
+          </div>
+          <div class="form-group">
+            <label>Objetivos</label>
+            <textarea name="objetivos" placeholder="O que você espera aprender com este mentor?" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Solicitar Mentoria</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal: Detalhe da Oportunidade ═══════════════════════════════ -->
+  <div class="modal-overlay" id="oportunidadeDetailModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('oportunidadeDetailModal')">&times;</button>
+      <div class="modal-body" id="oportunidadeDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Modal: Reputação ════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="reputacaoModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('reputacaoModal')">&times;</button>
+      <div class="modal-body" id="reputacaoModalBody"></div>
+    </div>
+  </div>
+
+  <script src="/script.js"></script>
+  <script src="/v2.js"></script>
+</body>
+</html>

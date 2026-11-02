@@ -1,0 +1,23 @@
+[project]
+name = "prosync"
+version = "0.1.0"
+description = "ProSync - Plataforma de conexão profissional para remotos brasileiros"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "sqlalchemy>=2.0.0",
+    "python-jose[cryptography]>=3.3.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+    "passlib[bcrypt]>=1.7.2",
+    # passlib 1.7.4 quebra com bcrypt >= 4.1 (ValueError: password cannot be longer than 72 bytes)
+    "bcrypt>=4.0,<4.1",
+    "python-multipart>=0.0.6",
+    # Driver Postgres (produção / docker-compose).
+    "psycopg[binary]>=3.1.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"

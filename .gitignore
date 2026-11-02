@@ -1,0 +1,30 @@
+# Dependências Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Ambiente
+.env
+.env.local
+
+# Banco local
+*.db
+*.db-journal
+*.sqlite3
+
+# Ferramentas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor / SO
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# Artefatos
+_screenshot*.png
+_screenshot*.png
