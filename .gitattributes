@@ -1,0 +1,8 @@
+# Garante LF em arquivos que rodam no Linux (VPS).
+# Sem isso, um checkout/edicao no Windows pode gravar CRLF e quebrar
+# com "/bin/bash^M: bad interpreter".
+*.sh text eol=lf
+Caddyfile text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
