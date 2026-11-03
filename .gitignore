@@ -28,3 +28,6 @@ desktop.ini
 # Artefatos
 _screenshot*.png
 _screenshot*.png
+
+# Dumps locais de backup
+backups/

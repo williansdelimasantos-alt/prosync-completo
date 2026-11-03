@@ -239,9 +239,79 @@ docker system df
 
 ---
 
+## Backup do banco (faca isso)
+
+O backup roda sozinho todo dia as 3h da manha e guarda os **ultimos 7 dias**
+em `~/prosync-completo/backups/`. Sem isso, uma falha no disco apaga tudo.
+
+### 1. Dar permissao de execucao ao script
+
+```bash
+cd ~/prosync-completo
+chmod +x scripts/backup.sh
+```
+
+### 2. Fazer um backup manual (para confirmar que funciona)
+
+```bash
+./scripts/backup.sh
+```
+
+Saida esperada (com o nome do arquivo e o tamanho):
+
+```
+[2026-11-02 03:00:01] OK backups/prosync-20261102-030001.sql.gz (24K)
+```
+
+Confira que o arquivo existe:
+
+```bash
+ls -lh backups/
+```
+
+### 3. Agendar para rodar todo dia
+
+Cole este comando **de uma vez** (ele troca `SEU-USUARIO` automaticamente
+pelo seu usuario real):
+
+```bash
+(crontab -l 2>/dev/null; echo "0 3 * * * $HOME/prosync-completo/scripts/backup.sh >> $HOME/backup.log 2>&1") | crontab -
+```
+
+Confirme que a linha foi gravada:
+
+```bash
+crontab -l
+```
+
+Deve aparecer `0 3 * * * /home/.../scripts/backup.sh ...`.
+
+### 4. Restaurar um backup (se precisar voltar atras)
+
+> Isto **substitui** os dados atuais pelos do arquivo escolhido.
+
+```bash
+cd ~/prosync-completo
+gunzip -c backups/prosync-20261102-030001.sql.gz | \
+  docker compose -f docker-compose.prod.yml exec -T db psql -U prosync -d prosync
+```
+
+Troque o nome do arquivo pelo backup que voce quer restaurar.
+
+### 5. Copiar os backups para fora da VPS
+
+Um backup que fica so na mesma maquina nao protege contra perda da VPS.
+Do **seu computador** (Windows PowerShell), baixe periodicamente:
+
+```powershell
+scp -r seu-usuario@IP_DA_VPS:~/prosync-completo/backups .\backups-prosync
+```
+
+---
+
 ## Limitacoes conhecidas desta configuracao
 
-- **Sem backup automatico do banco.** Recomendado configurar depois um
-  `pg_dump` diario via cron.
-- **Sem monitoramento externo** de disponibilidade.
+- **Sem monitoramento externo** de disponibilidade (o backup ja esta coberto).
+- A copia dos backups para fora da VPS e **manual** — o passo 5 acima precisa
+  ser feito de tempo em tempo.
 - O banco nao e acessivel de fora da VPS (proposital).
