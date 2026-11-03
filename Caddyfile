@@ -1,0 +1,33 @@
+# Caddy — proxy reverso com HTTPS automatico (Let's Encrypt)
+#
+# O Caddy pede o certificado sozinho no primeiro acesso e renova a cada 90 dias.
+# Nao precisa de certbot, cron nem configuracao de renovacao.
+#
+# IMPORTANTE: substitua o dominio abaixo caso mude. O mesmo dominio precisa
+# estar em CORS_ORIGINS no .env (com https://) e o DNS tipo A apontando
+# para o IP da VPS ANTES de subir o compose.
+
+prosync.mindnexo.com.br {
+	encode zstd gzip
+
+	# Passa o IP real para a aplicacao (o Caddy ja envia X-Forwarded-Proto).
+	reverse_proxy app:8000 {
+		header_up X-Real-IP {remote_host}
+	}
+
+	# Cabecalhos de seguranca basicos.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10mb
+			roll_keep 5
+		}
+	}
+}
